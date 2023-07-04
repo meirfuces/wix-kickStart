@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -29,19 +30,18 @@ public class TicketServiceFilter {
         }
 
     private List<TicketEntity> filterTicketByTitle(List<TicketEntity> ticketEntityList, String title) {
-        Predicate <TicketEntity> contentPredicate = ticketEntity -> ticketEntity.getTitle().equals(title);
-        return filterTicketByField(ticketEntityList,title,contentPredicate);
+        Predicate <TicketEntity> contentPredicate = ticketEntity -> ticketEntity.getTitle().contains(title);
+        return filterTicketByField(ticketEntityList,contentPredicate);
     }
 
     private List<TicketEntity> filterTicketByContent(List<TicketEntity> ticketEntityList, String content) {
-        Predicate <TicketEntity> contentPredicate = ticketEntity -> ticketEntity.getContent().equals(content);
-        return filterTicketByField(ticketEntityList,content,contentPredicate);
+        Predicate <TicketEntity> contentPredicate = ticketEntity -> ticketEntity.getContent().contains(content);
+        return filterTicketByField(ticketEntityList,contentPredicate);
     }
-    public List<TicketEntity> filterTicketByField(List<TicketEntity> ticketEntityList, String title, Predicate<TicketEntity> predicate){
+    public List<TicketEntity> filterTicketByField(List<TicketEntity> ticketEntityList, Predicate<TicketEntity> predicate){
         return ticketEntityList.stream().filter(predicate).collect(Collectors.toList());
 
     }
-
 
     public List<TicketEntity> filterTicketsByTime( List<TicketEntity> ticketEntityList, Long to , Long from){
         if (from==null && to ==null ) {
@@ -51,8 +51,8 @@ public class TicketServiceFilter {
 
     }
     public List<TicketEntity> filterTicketByEmail(List<TicketEntity> ticketEntityList, String email){
-        Predicate <TicketEntity> emailPredicate = ticketEntity -> ticketEntity.getUserEmail().equals(email);
-        return filterTicketByField(ticketEntityList,email,emailPredicate);
+        Predicate <TicketEntity> emailPredicate = ticketEntity -> ticketEntity.getUserEmail().contains(email);
+        return filterTicketByField(ticketEntityList,emailPredicate);
     }
 
     private boolean isTicketWithinTime(TicketEntity ticketEntity, Long from, Long to) {

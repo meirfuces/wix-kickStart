@@ -19,10 +19,6 @@ public class TicketsController {
     @Autowired
     TicketServiceFilter ticketServiceFilter;
 
-//    @GetMapping("/tickets")
-//    public List<TicketEntity> getAllTickets() {
-//        return ticketServiceLoader.loadEntities();
-//    }
 
     @GetMapping("/tickets")
     public List<TicketEntity> getAllTicketsByFilter(@RequestParam(required = false) String title,
