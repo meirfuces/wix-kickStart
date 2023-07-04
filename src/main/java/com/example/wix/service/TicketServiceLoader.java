@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 public class TicketServiceLoader {
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final String FILE_PATH = "C:\\Users\\Administrator\\IdeaProjects\\demo\\src\\main\\resources\\data.json";
+    private static final String FILE_PATH = "src/main/resources/data.json";
     public static List<TicketEntity> loadEntities() {
 
         try {

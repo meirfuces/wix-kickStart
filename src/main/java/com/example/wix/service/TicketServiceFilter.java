@@ -4,9 +4,9 @@ import com.example.wix.entities.TicketEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -16,44 +16,52 @@ public class TicketServiceFilter {
     TicketServiceLoader ticketServiceLoader;
     public List<TicketEntity> filterTickets(HashMap<String, Object> filterMap){
         List<TicketEntity> ticketEntityList = ticketServiceLoader.loadEntities();
-        if (filterMap.get("title")!=null){
-            ticketEntityList = filterTicketByTitle(ticketEntityList,(String) filterMap.get("title"));
-        }
-            ticketEntityList =filterTicketsByTime(ticketEntityList, (Long)filterMap.get("toTime"), (Long)filterMap.get("fromTime"));
-        if (filterMap.get("content")!=null) {
-            ticketEntityList = filterTicketByContent(ticketEntityList,(String) filterMap.get("content"));
-        }
-        if (filterMap.get("email")!=null) {
-            ticketEntityList = filterTicketByEmail(ticketEntityList,(String) filterMap.get("email"));
-        }
+            ticketEntityList = filterTicketByTitle(filterMap,ticketEntityList);
+            ticketEntityList =filterTicketsByTime(filterMap, ticketEntityList);
+            ticketEntityList = filterTicketByContent(filterMap, ticketEntityList);
+            ticketEntityList = filterTicketByEmail(filterMap, ticketEntityList);
         return ticketEntityList;
         }
 
-    private List<TicketEntity> filterTicketByTitle(List<TicketEntity> ticketEntityList, String title) {
-        Predicate <TicketEntity> contentPredicate = ticketEntity -> ticketEntity.getTitle().contains(title);
-        return filterTicketByField(ticketEntityList,contentPredicate);
+    private List<TicketEntity> filterTicketByTitle(HashMap<String, Object> filterMap, List<TicketEntity> ticketEntityList ) {
+        if (filterMap.get("title")!=null) {
+            String title= (String) filterMap.get("title");
+            Predicate<TicketEntity> contentPredicate = ticketEntity -> ticketEntity.getTitle().contains(title);
+            return filterTicketByField(ticketEntityList, contentPredicate);
+        }
+        return ticketEntityList;
     }
 
-    private List<TicketEntity> filterTicketByContent(List<TicketEntity> ticketEntityList, String content) {
-        Predicate <TicketEntity> contentPredicate = ticketEntity -> ticketEntity.getContent().contains(content);
-        return filterTicketByField(ticketEntityList,contentPredicate);
-    }
+    private List<TicketEntity> filterTicketByContent(HashMap<String, Object> filterMap, List<TicketEntity> ticketEntityList) {
+        if (filterMap.get("content")!=null) {
+            String content = (String) filterMap.get("content");
+            Predicate<TicketEntity> contentPredicate = ticketEntity -> ticketEntity.getContent().contains(content);
+            return filterTicketByField(ticketEntityList, contentPredicate);
+        }
+        return ticketEntityList;
+        }
     public List<TicketEntity> filterTicketByField(List<TicketEntity> ticketEntityList, Predicate<TicketEntity> predicate){
         return ticketEntityList.stream().filter(predicate).collect(Collectors.toList());
 
     }
 
-    public List<TicketEntity> filterTicketsByTime( List<TicketEntity> ticketEntityList, Long to , Long from){
+    public List<TicketEntity> filterTicketsByTime(HashMap<String, Object> filterMap, List<TicketEntity> ticketEntityList){
+        Long to= (Long)filterMap.get("toTime");
+        Long from = (Long)filterMap.get("fromTime");
         if (from==null && to ==null ) {
             return ticketEntityList;
         }
         return ticketEntityList.stream().filter(ticketEntity -> isTicketWithinTime(ticketEntity,from,to)).collect(Collectors.toList());
 
     }
-    public List<TicketEntity> filterTicketByEmail(List<TicketEntity> ticketEntityList, String email){
-        Predicate <TicketEntity> emailPredicate = ticketEntity -> ticketEntity.getUserEmail().contains(email);
-        return filterTicketByField(ticketEntityList,emailPredicate);
-    }
+    public List<TicketEntity> filterTicketByEmail(HashMap<String, Object> filterMap, List<TicketEntity> ticketEntityList){
+        if (filterMap.get("email")!=null) {
+            String email = (String) filterMap.get("email");
+            Predicate<TicketEntity> emailPredicate = ticketEntity -> ticketEntity.getUserEmail().contains(email);
+            return filterTicketByField(ticketEntityList, emailPredicate);
+        }
+        return ticketEntityList;
+        }
 
     private boolean isTicketWithinTime(TicketEntity ticketEntity, Long from, Long to) {
 
@@ -74,9 +82,6 @@ public class TicketServiceFilter {
         }
 
         return ticketTime<=to;
-    }
-    private List<TicketEntity> isBeforeTo(List<TicketEntity> ticketList, long to) {
-        return ticketList.stream().filter(ticket-> to>=ticket.getCreationTime()).collect(Collectors.toList());
     }
     }
 

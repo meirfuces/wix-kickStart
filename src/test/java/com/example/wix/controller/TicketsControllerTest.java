@@ -2,8 +2,7 @@ package com.example.wix.controller;
 
 import com.example.wix.entities.TicketEntity;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +28,7 @@ TicketsController ticketsController;
         Long fromTime =1542111235545L;
         List<TicketEntity> ticketEntityList =ticketsController.getAllTicketsByFilter(null, fromTime, null,null,null);
         Optional<TicketEntity> ticketEntity1= ticketEntityList.stream().filter(ticketEntity -> ticketEntity.getCreationTime()<=fromTime).findAny();
-        Assert.assertEquals(ticketEntity1.isPresent(),false);
+        Assertions.assertFalse(ticketEntity1.isPresent());
     }
     @Test
     void getTicketByFromTime(){
@@ -51,18 +50,14 @@ TicketsController ticketsController;
     void getTicketByToContent(){
         String content = "want to ask";
         List<TicketEntity> ticketEntityList =ticketsController.getAllTicketsByFilter(null, null, null,content,null);
-        ticketEntityList.stream().forEach(ticketEntity -> {
-            Assert.assertTrue(ticketEntity.getContent().contains(content));
-        });
+        ticketEntityList.forEach(ticketEntity -> Assert.assertTrue(ticketEntity.getContent().contains(content)));
     }
 
     @Test
     void getTicketByEmail(){
         String email = "cube@zo.lv";
         List<TicketEntity> ticketEntityList =ticketsController.getAllTicketsByFilter(null, null, null,null,"cube@zo.lv");
-        ticketEntityList.stream().forEach(ticketEntity -> {
-            Assert.assertEquals(ticketEntity.getUserEmail(),email);
-        });
+        ticketEntityList.forEach(ticketEntity -> Assert.assertEquals(ticketEntity.getUserEmail(),email));
     }
     @Test
     void getTicketByFields(){
@@ -70,7 +65,7 @@ TicketsController ticketsController;
         String content = "want to ask";
 
         List<TicketEntity> ticketEntityList =ticketsController.getAllTicketsByFilter("setting up my login page profile", null, null,         content ,"cube@zo.lv");
-        ticketEntityList.stream().forEach(ticketEntity -> {
+        ticketEntityList.forEach(ticketEntity -> {
             Assert.assertEquals(ticketEntity.getUserEmail(),email);
             Assert.assertEquals(ticketEntity.getTitle(),"setting up my login page profile");
             Assert.assertTrue(ticketEntity.getContent().contains(content));
